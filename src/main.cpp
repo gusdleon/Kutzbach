@@ -16,6 +16,7 @@ char valor_n[3];
 char valor_j[3];
 char valor_g[3];
 char tecla;
+String msg;
 
 int j=1;
 
@@ -39,6 +40,8 @@ void displayMenu();
 void displayTerminos();
 void displayCalcular();
 void setup() {
+  Serial.begin(9600);
+  Serial.println("Iniciando");
   lcd.init();
   lcd.clear();			// limpia pantalla
   lcd.setCursor(2 , 4);
@@ -102,10 +105,9 @@ void displayCalcular(){
   lcd.print("m=3(n-1)-2(j1)-(g)");
 
 
-  for(int i; i <= 3; i++) //Preguntar por los valores de cada variable, y asignarlos a un array tipo char
+  for(int i = 0; i < 3; i++) //Preguntar por los valores de cada variable, y asignarlos a un array tipo char
   {
-
-    String msg = "INGRESA EL VALOR: " + variables[i];
+    msg = "INGRESA EL VALOR: " + variables[i];
     lcd.setCursor(1,0);
     lcd.print(msg);
     lcd.setCursor(4,10);
