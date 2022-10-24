@@ -8,14 +8,12 @@ LiquidCrystal_I2C lcd(0x27,20,4);
 
 
 //variables
-char expression ='A';
-char oldexpression;
+char expression ='*'; 
 char variables[3] = {'n','j','g'};
-char *nvariables[3];
-char valor_n[3];
-char valor_j[3];
-char valor_g[3];
 char tecla;
+int valor_m;
+int valor;
+int valores_variables[3]; //continen los valores decimales de cada variable de la ecuación
 
 int j=1;
 
@@ -38,93 +36,114 @@ Keypad teclado = Keypad(makeKeymap(keys), pinesFilas, pinesColumnas, FILAS, COLU
 void displayMenu();
 void displayTerminos();
 void displayCalcular();
+int ObtenerValor();
+
+
 void setup() {
+  lcd.setContrast(HIGH);
+  lcd.setBacklight(HIGH);
+  Serial.begin(9600);
   lcd.init();
-  lcd.clear();			// limpia pantalla
-  lcd.setCursor(2 , 4);
+  lcd.clear();	// limpia pantalla
+  lcd.setCursor(2 , 0);
   lcd.print("INICIALIZANDO");
-  lcd.setCursor(3 , 7);
+  lcd.setCursor(4 , 3);
   lcd.print("CARGANDO");
   delay(3000);
   lcd.clear();
 }
 
 void loop() {
-  oldexpression = expression;
-  delay(1);
-  expression = teclado.getKey();
-  if(oldexpression != expression) lcd.clear();
-
-
+  tecla = teclado.getKey();
+  if(tecla){ //Condicional detecta un cambio de tecla para borrar la pantalla
+    expression = tecla;
+    lcd.clear();
+  }
+  delay(100); //delay de chill
   if(expression)
     switch (expression)
   {
-  case 'A': //Display Menu
+  case '*': //Display Menu
       displayMenu();
+      expression = ' ';
     break;
-  case 'B': //Display Terminos
+  case '#': //Display Terminos
       displayTerminos();
+      expression = ' ';
     break;
-  case 'C': //Display Calcular
+  case 'A': //Display Calcular
       displayCalcular();
+      expression = ' ';
     break;
 
   default:
-
     break;
   }
 }
 
 //Funciones
-void displayMenu(){
-  lcd.setCursor(0 ,6 );
+void displayMenu(){ //Imprime el menu inicial
+
+  lcd.setCursor(6 ,0 );
   lcd.print("KUTZBACH!");
-  lcd.setCursor(1,0);
+  lcd.setCursor(0,1);
   lcd.print("m=3(n-1)-2(j)-(g)");
-  lcd.setCursor(2,0);
+  lcd.setCursor(0,2);
   lcd.print("Terminos  | Calcular");
-  lcd.setCursor(3,0);
-  lcd.print(" 'B'      |    'C'  ");
+  lcd.setCursor(0,3);
+  lcd.print(" 'info'   |   'A'   ");
 }
-void displayTerminos(){
+void displayTerminos(){ //Imprime pequeña info sobre cada variable de la ecuacion
   lcd.setCursor(0 ,0 );
   lcd.print("m = Movilidad ");
-  lcd.setCursor(1,0);
+  lcd.setCursor(0,1);
   lcd.print("n = eslabones,barras");
-  lcd.setCursor(2,0);
-  lcd.print("ji=Uniones 1° |Menu");
-  lcd.setCursor(3,0);
-  lcd.print("g =Uniones 2° |'A' ");
+  lcd.setCursor(0,2);
+  lcd.print("j=Uniones 1 grado ");
+  lcd.setCursor(0,3);
+  lcd.print("g=Uniones 2 grados ");
 }
 
 void displayCalcular(){
-  lcd.setCursor(0,0);
-  lcd.print("m=3(n-1)-2(j1)-(g)");
-
-
-  for(int i; i <= 3; i++) //Preguntar por los valores de cada variable, y asignarlos a un array tipo char
+  
+  for(int i = 0; i < 3; i++) //Preguntar por los valores de cada variable, y asignarlos a un array tipo char
   {
-
-    String msg = "INGRESA EL VALOR: " + variables[i];
-    lcd.setCursor(1,0);
-    lcd.print(msg);
-    lcd.setCursor(4,10);
-    lcd.print("OK-->#");
-    lcd.setCursor(2,0);
-    while(*nvariables[i] != 'a')
-    {
-
-      tecla = teclado.getKey();
-      if(tecla){
-        valor_n[j] = tecla;
-        j++;
-      }
-
-
-
-    }
+    lcd.setCursor(0,0);
+    lcd.print("m=3(n-1)-2(j)-(g)");
+    lcd.setCursor(13,3);
+    lcd.print("OK-->D");
+    lcd.setCursor(0,1);
+    lcd.print("Ingresa el valor: ");
+    lcd.print(variables[i]);
+    lcd.setCursor(0,2);
+    valores_variables[i] = ObtenerValor();//asignar a un array el valor de cada variable de la ecuacion.
+    valor = 0;
+    if(i<2) lcd.clear();
   }
-  //Convertir el array tipo char a uno con valores int.
+  valor_m = (3*(valores_variables[0]-1))-(2*valores_variables[1])-(valores_variables[2]);//Asignar valor total utilizando los valores
+  lcd.setCursor(0,3);                                                                    //del array "valores_variables"
+  lcd.print("m = ");
+  lcd.print(valor_m);
+  lcd.setCursor(9,3);
+  lcd.print("Menu->Back");
+}
 
 
+
+int ObtenerValor(){ //Algoritmo para obtener el valor decimal de un tipo caracter de entrada '0...9'
+
+while( 1 )
+  {
+    tecla = teclado.getKey();
+    if(tecla >= '0' && tecla <= '9')
+    {
+      valor = valor * 10 + (tecla - '0');
+      lcd.setCursor(0,2); 
+      lcd.print(valor);
+      Serial.println(valor);
+    }
+
+    if(tecla == 'D') break;  //Enter para salir del while 
+  }
+ return valor; 
 }
