@@ -60,6 +60,8 @@ void setup(){
 }
 
 void loop(){
+	digitalWrite(IN1, LOW);//Se gira
+	digitalWrite(IN2, HIGH);
 	tecla = teclado.getKey();
 	if (tecla){ // Condicional detecta un cambio de tecla para borrar la pantalla
 		expression = tecla;
@@ -95,19 +97,11 @@ void loop(){
 
 // Funciones
 void mIzq(){
-	digitalWrite(ENA, HIGH); // Se enciende motor
-	digitalWrite(IN1, LOW);	 // Se gira
-	digitalWrite(IN2, HIGH);
-	delay(500);
-	digitalWrite(ENA, LOW);
+	digitalWrite(ENA, LOW); // Se apaga motor
 }
 
 void mDer(){
-	digitalWrite(ENA, HIGH); // Se enciende motor
-	digitalWrite(IN1, HIGH); // Se gira
-	digitalWrite(IN2, LOW);
-	delay(500);
-	digitalWrite(ENA, LOW);
+	digitalWrite(ENA, HIGH); //Se apaga motor
 }
 
 void displayMenu(){ // Imprime el menu inicial
