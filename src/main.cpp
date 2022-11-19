@@ -15,6 +15,10 @@ int valor_m;
 int valor;
 int valores_variables[3]; //continen los valores decimales de cada variable de la ecuación
 
+int IN1=10;//Se definen pines de salida al puente H
+int IN2=11;
+int ENA=12;
+
 int j=1;
 
 const byte FILAS = 4;     // define numero de filas
@@ -37,6 +41,8 @@ void displayMenu();
 void displayTerminos();
 void displayCalcular();
 int ObtenerValor();
+void Mizq();
+void Mder();
 
 
 void setup() {
@@ -51,6 +57,9 @@ void setup() {
   lcd.print("CARGANDO");
   delay(3000);
   lcd.clear();
+  pinMode(IN1, OUTPUT);//Salida de pines a puente H
+  pinMode(IN2, OUTPUT);
+  pinMode(ENA, OUTPUT);
 }
 
 void loop() {
@@ -63,11 +72,11 @@ void loop() {
   if(expression)
     switch (expression)
   {
-  case '*': //Display Menu
+  case 'B': //Display Menu
       displayMenu();
       expression = ' ';
     break;
-  case '#': //Display Terminos
+  case 'C': //Display Terminos
       displayTerminos();
       expression = ' ';
     break;
@@ -75,15 +84,38 @@ void loop() {
       displayCalcular();
       expression = ' ';
     break;
-
+  case '*': //Grio izquierda
+      displayMenu();
+      Mizq();
+      expression = ' ';
+    break;
+  case '#': //Giro derecha
+      displayMenu();
+      Mder();
+      expression = ' ';
   default:
     break;
   }
 }
 
 //Funciones
-void displayMenu(){ //Imprime el menu inicial
+void Mizq(){
+  digitalWrite(ENA, HIGH);//Se enciende motor
+  digitalWrite(IN1, LOW);//Se gira
+  digitalWrite(IN2, HIGH);
+  delay(500);
+  digitalWrite(ENA, LOW);
+}
 
+void Mder(){
+  digitalWrite(ENA, HIGH);//Se enciende motor
+  digitalWrite(IN1, HIGH);//Se gira
+  digitalWrite(IN2, LOW);
+  delay(500);
+  digitalWrite(ENA, LOW);
+}
+
+void displayMenu(){ //Imprime el menu inicial
   lcd.setCursor(6 ,0 );
   lcd.print("KUTZBACH!");
   lcd.setCursor(0,1);
@@ -93,6 +125,7 @@ void displayMenu(){ //Imprime el menu inicial
   lcd.setCursor(0,3);
   lcd.print(" 'info'   |   'A'   ");
 }
+
 void displayTerminos(){ //Imprime pequeña info sobre cada variable de la ecuacion
   lcd.setCursor(0 ,0 );
   lcd.print("m = Movilidad ");
@@ -138,12 +171,12 @@ while( 1 )
     if(tecla >= '0' && tecla <= '9')
     {
       valor = valor * 10 + (tecla - '0');
-      lcd.setCursor(0,2); 
+      lcd.setCursor(0,2);
       lcd.print(valor);
       Serial.println(valor);
     }
 
-    if(tecla == 'D') break;  //Enter para salir del while 
+    if(tecla == 'D') break;  //Enter para salir del while
   }
- return valor; 
+ return valor;
 }
